@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MountainController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
@@ -22,3 +23,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users', [UserController::class, 'store']); // Create User/Admin
     Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete
 });
+
+Route::apiResource('mountains', MountainController::class);
