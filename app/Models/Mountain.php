@@ -22,4 +22,8 @@ class Mountain extends Model
         'pos',
         'image',
     ];
+    protected $casts = [
+        'quota' => 'integer',
+        'price' => 'decimal:2',
+    ];
 }
