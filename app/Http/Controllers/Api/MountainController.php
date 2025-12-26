@@ -18,7 +18,12 @@ class MountainController extends Controller
         try {
             $mountains = Mountain::orderBy('created_at', 'desc')->get();
 
-            return response()->json($mountains, 200);
+            // Return a consistent envelope like other endpoints
+            return response()->json([
+                'success' => true,
+                'message' => 'List of mountains',
+                'data' => $mountains,
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch mountains',
