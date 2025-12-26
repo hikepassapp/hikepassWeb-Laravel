@@ -24,6 +24,21 @@ class ReservationController extends Controller
         ], 200);
     }
 
+    public function all(): JsonResponse
+    {
+        // Mengambil SEMUA data reservasi beserta relasi mountain
+        // Tanpa filter whereDoesntHave('checkin')
+        $reservations = Reservation::with('mountain')
+            ->orderBy('created_at', 'desc') // Opsional: urutkan dari yang terbaru
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All reservations data retrieved successfully',
+            'data' => $reservations
+        ], 200);
+    }
+
     public function store(Request $request): JsonResponse
     {
         // Debug logging
