@@ -12,7 +12,10 @@ class CheckinController extends Controller
 {
     public function index(): JsonResponse
     {
-        $checkins = Checkin::with('reservation.mountain')->get();
+        // Show only check-ins that have not progressed to check-out
+        $checkins = Checkin::with('reservation.mountain')
+            ->whereDoesntHave('checkout')
+            ->get();
         
         return response()->json([
             'success' => true,

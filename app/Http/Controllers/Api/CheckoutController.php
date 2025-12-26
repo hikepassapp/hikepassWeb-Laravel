@@ -13,7 +13,10 @@ class CheckoutController extends Controller
 {
     public function index(): JsonResponse
     {
-        $checkouts = Checkout::with(['checkin.reservation.mountain'])->get();
+        // Show only check-outs that have not progressed to history (finished)
+        $checkouts = Checkout::with(['checkin.reservation.mountain'])
+            ->whereDoesntHave('history')
+            ->get();
         
         return response()->json([
             'success' => true,

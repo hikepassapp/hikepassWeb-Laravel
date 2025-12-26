@@ -12,7 +12,10 @@ class ReservationController extends Controller
 {
     public function index(): JsonResponse
     {
-        $reservations = Reservation::with('mountain')->get();
+        // Show only reservations that have not progressed to check-in
+        $reservations = Reservation::with('mountain')
+            ->whereDoesntHave('checkin')
+            ->get();
         
         return response()->json([
             'success' => true,
