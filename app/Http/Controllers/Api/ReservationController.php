@@ -37,6 +37,21 @@ class ReservationController extends Controller
             'citizen' => 'required|string|max:255',
             'id_card' => 'required|string|max:255',
             'price' => 'required|integer',
+        ], [
+            'id_mountain.required' => 'Pilih gunung terlebih dahulu',
+            'id_mountain.exists' => 'Gunung tidak ditemukan',
+            'start_date.required' => 'Tanggal mulai wajib diisi',
+            'start_date.date' => 'Format tanggal tidak valid',
+            'name.required' => 'Nama lengkap wajib diisi',
+            'nik.required' => 'NIK wajib diisi',
+            'gender.required' => 'Jenis kelamin wajib dipilih',
+            'gender.in' => 'Jenis kelamin harus male atau female',
+            'phone_number.required' => 'Nomor telepon wajib diisi',
+            'address.required' => 'Alamat wajib diisi',
+            'citizen.required' => 'Kewarganegaraan wajib diisi',
+            'id_card.required' => 'Nomor KTP/ID Card wajib diisi',
+            'price.required' => 'Harga wajib diisi',
+            'price.integer' => 'Harga harus berupa angka bulat',
         ]);
 
         if ($validator->fails()) {
