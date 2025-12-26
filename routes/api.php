@@ -42,3 +42,4 @@ Route::apiResource('histories', HistoryController::class);
 Route::get('checkouts/{id}/history', [HistoryController::class, 'getByCheckout']);
 Route::get('reservations/{id}/history', [HistoryController::class, 'getByReservation']);
 Route::post('checkouts/{id}/create-history', [HistoryController::class, 'createFromCheckout']);
+Route::post('histories/checkout/{id}', [HistoryController::class, 'createFromCheckout']);
