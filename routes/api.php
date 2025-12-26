@@ -1,11 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\MountainController;
-use App\Http\Controllers\Api\ReservationController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\MountainController;
+use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\CheckinController;
+use App\Http\Controllers\Api\CheckoutController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,3 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::apiResource('mountains', MountainController::class);
 Route::apiResource('reservations', ReservationController::class);
+Route::apiResource('checkins', CheckinController::class);
+Route::get('reservations/{id}/checkin', [CheckinController::class, 'getByReservation']);
+Route::apiResource('checkouts', CheckoutController::class);
+Route::get('checkins/{id}/checkout', [CheckoutController::class, 'getByCheckin']);
+Route::get('reservations/{id}/checkout', [CheckoutController::class, 'getByReservation']);
