@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\MountainController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\CheckinController;
 use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\HistoryController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -37,3 +38,7 @@ Route::get('reservations/{id}/checkin', [CheckinController::class, 'getByReserva
 Route::apiResource('checkouts', CheckoutController::class);
 Route::get('checkins/{id}/checkout', [CheckoutController::class, 'getByCheckin']);
 Route::get('reservations/{id}/checkout', [CheckoutController::class, 'getByReservation']);
+Route::apiResource('histories', HistoryController::class);
+Route::get('checkouts/{id}/history', [HistoryController::class, 'getByCheckout']);
+Route::get('reservations/{id}/history', [HistoryController::class, 'getByReservation']);
+Route::post('checkouts/{id}/create-history', [HistoryController::class, 'createFromCheckout']);

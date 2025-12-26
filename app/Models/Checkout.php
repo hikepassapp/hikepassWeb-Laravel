@@ -35,4 +35,9 @@ class Checkout extends Model
             'id_reservation' // Local key di checkins
         );
     }
+
+    public function history()
+    {
+        return $this->hasOne(History::class, 'id_checkout', 'id');
+    }
 }
