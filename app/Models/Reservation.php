@@ -32,4 +32,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(Mountain::class, 'id_mountain', 'id');
     }
+
+    public function checkin()
+    {
+        return $this->hasOne(Checkin::class, 'id_reservation', 'id');
+    }
 }
