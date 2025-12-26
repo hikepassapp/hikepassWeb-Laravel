@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\CheckinController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\HistoryController;
+use App\Http\Controllers\Api\LaporanController;
+use App\Http\Controllers\Api\InformasiController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -42,4 +44,6 @@ Route::apiResource('histories', HistoryController::class);
 Route::get('checkouts/{id}/history', [HistoryController::class, 'getByCheckout']);
 Route::get('reservations/{id}/history', [HistoryController::class, 'getByReservation']);
 Route::post('checkouts/{id}/create-history', [HistoryController::class, 'createFromCheckout']);
+Route::apiResource('laporans', LaporanController::class);
+Route::apiResource('informasi', InformasiController::class);
 Route::post('histories/checkout/{id}', [HistoryController::class, 'createFromCheckout']);
