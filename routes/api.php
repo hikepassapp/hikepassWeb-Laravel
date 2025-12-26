@@ -20,7 +20,6 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -29,11 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customers', [UserController::class, 'getCustomers']);
     Route::get('/admins', [UserController::class, 'getAdmins']);
-    Route::post('/users', [UserController::class, 'store']); // Create User/Admin
-    Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete
+    Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
 
 Route::apiResource('mountains', MountainController::class);
+Route::get('reservations/all', [ReservationController::class, 'all']);
 Route::apiResource('reservations', ReservationController::class);
 Route::apiResource('checkins', CheckinController::class);
 Route::get('reservations/{id}/checkin', [CheckinController::class, 'getByReservation']);
