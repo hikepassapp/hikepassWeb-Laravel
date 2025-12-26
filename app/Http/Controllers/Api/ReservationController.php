@@ -16,7 +16,7 @@ class ReservationController extends Controller
         $reservations = Reservation::with('mountain')
             ->whereDoesntHave('checkin')
             ->get();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'List of reservations',
@@ -26,6 +26,15 @@ class ReservationController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        // Debug logging
+        \Log::info('📥 Reservation request received', [
+            'has_file' => $request->hasFile('id_card'),
+            'all_files' => array_keys($request->allFiles()),
+            'content_type' => $request->header('Content-Type'),
+            'id_card_exists' => $request->has('id_card'),
+        ]);
+
+        // Simplified validation - always expect file upload for id_card
         $validator = Validator::make($request->all(), [
             'id_mountain' => 'required|exists:mountains,id',
             'start_date' => 'required|date',
@@ -35,26 +44,15 @@ class ReservationController extends Controller
             'phone_number' => 'required|string|max:255',
             'address' => 'required|string',
             'citizen' => 'required|string|max:255',
-            'id_card' => 'required|string|max:255',
             'price' => 'required|integer',
-        ], [
-            'id_mountain.required' => 'Pilih gunung terlebih dahulu',
-            'id_mountain.exists' => 'Gunung tidak ditemukan',
-            'start_date.required' => 'Tanggal mulai wajib diisi',
-            'start_date.date' => 'Format tanggal tidak valid',
-            'name.required' => 'Nama lengkap wajib diisi',
-            'nik.required' => 'NIK wajib diisi',
-            'gender.required' => 'Jenis kelamin wajib dipilih',
-            'gender.in' => 'Jenis kelamin harus male atau female',
-            'phone_number.required' => 'Nomor telepon wajib diisi',
-            'address.required' => 'Alamat wajib diisi',
-            'citizen.required' => 'Kewarganegaraan wajib diisi',
-            'id_card.required' => 'Nomor KTP/ID Card wajib diisi',
-            'price.required' => 'Harga wajib diisi',
-            'price.integer' => 'Harga harus berupa angka bulat',
+            'id_card' => 'required|file|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         if ($validator->fails()) {
+            \Log::error('❌ Validation failed', [
+                'errors' => $validator->errors()->toArray()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
@@ -62,7 +60,17 @@ class ReservationController extends Controller
             ], 422);
         }
 
-        $reservation = Reservation::create($request->all());
+        $data = $request->all();
+
+        // Handle file upload for id_card if it's a file
+        if ($request->hasFile('id_card')) {
+            $file = $request->file('id_card');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('id_cards', $filename, 'public');
+            $data['id_card'] = $path;
+        }
+
+        $reservation = Reservation::create($data);
 
         return response()->json([
             'success' => true,
@@ -100,7 +108,8 @@ class ReservationController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        // Flexible validation - accept either file or string for id_card
+        $rules = [
             'id_mountain' => 'sometimes|required|exists:mountains,id',
             'start_date' => 'sometimes|required|date',
             'name' => 'sometimes|required|string|max:255',
@@ -109,9 +118,17 @@ class ReservationController extends Controller
             'phone_number' => 'sometimes|required|string|max:255',
             'address' => 'sometimes|required|string',
             'citizen' => 'sometimes|required|string|max:255',
-            'id_card' => 'sometimes|required|string|max:255',
             'price' => 'sometimes|required|integer',
-        ]);
+        ];
+
+        // Check if id_card is a file or string
+        if ($request->hasFile('id_card')) {
+            $rules['id_card'] = 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120';
+        } else {
+            $rules['id_card'] = 'sometimes|nullable|string|max:255';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
@@ -121,7 +138,22 @@ class ReservationController extends Controller
             ], 422);
         }
 
-        $reservation->update($request->all());
+        $data = $request->all();
+
+        // Handle file upload for id_card if it's a file
+        if ($request->hasFile('id_card')) {
+            // Delete old file if exists and is a file path
+            if ($reservation->id_card && str_contains($reservation->id_card, '/') && \Storage::disk('public')->exists($reservation->id_card)) {
+                \Storage::disk('public')->delete($reservation->id_card);
+            }
+
+            $file = $request->file('id_card');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('id_cards', $filename, 'public');
+            $data['id_card'] = $path;
+        }
+
+        $reservation->update($data);
 
         return response()->json([
             'success' => true,
