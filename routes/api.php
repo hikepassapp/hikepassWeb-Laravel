@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 });
 
+Route::get('mountains/gunung-3-bulan', [MountainController::class, 'laporan3BulanTerakhir']);
 Route::apiResource('mountains', MountainController::class);
 Route::get('reservations/all', [ReservationController::class, 'all']);
 Route::apiResource('reservations', ReservationController::class);
