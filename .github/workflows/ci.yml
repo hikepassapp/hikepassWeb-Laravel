@@ -70,3 +70,8 @@ jobs:
       # 9. Test
       - name: Run tests
         run: php artisan test
+        
+      - name: SonarQube Scan
+        run: sonar-scanner
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
