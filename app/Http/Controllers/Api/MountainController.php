@@ -7,6 +7,8 @@ use App\Models\Mountain;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MountainController extends Controller
 {
@@ -131,9 +133,11 @@ class MountainController extends Controller
             // Handle image update
             if ($request->image_type !== 'keep') {
                 // Delete old image if it exists and is not default
-                if ($mountain->image &&
+                if (
+                    $mountain->image &&
                     $mountain->image !== self::DEFAULT_IMAGE_PATH &&
-                    ! filter_var($mountain->image, FILTER_VALIDATE_URL)) {
+                    !filter_var($mountain->image, FILTER_VALIDATE_URL)
+                ) {
                     Storage::disk('public')->delete($mountain->image);
                 }
 
@@ -168,9 +172,11 @@ class MountainController extends Controller
             $mountain = Mountain::findOrFail($id);
 
             // Delete image if it exists and is not default or URL
-            if ($mountain->image &&
+            if (
+                $mountain->image &&
                 $mountain->image !== self::DEFAULT_IMAGE_PATH &&
-                ! filter_var($mountain->image, FILTER_VALIDATE_URL)) {
+                !filter_var($mountain->image, FILTER_VALIDATE_URL)
+            ) {
                 Storage::disk('public')->delete($mountain->image);
             }
 
@@ -217,5 +223,27 @@ class MountainController extends Controller
             default:
                 return $request->input('image_path') ?? self::DEFAULT_IMAGE_PATH;
         }
+    }
+
+    public function laporan3bulanterakhir()
+    {
+        $data = Mountain::query()
+        -> select(
+            'mountains.id as mountain_id',
+            'mountains.name as nama_gunung',
+            DB::raw('COUNT(reservations.id) as total_pendaki'),
+            DB::raw('SUM(reservations.price) as total_pendapatan')
+        )
+        ->join('reservations', 'reservations.id_mountain', '=', 'mountains.id')
+        ->where('reservations.created_at', '>=', now()->subMonths(3))
+        ->groupBy('mountains.id', 'mountains.name')
+        ->orderByDesc('total_pendapatan')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan gunung 3 bulan terakhir',
+            'data' => $data
+        ]);
     }
 }
