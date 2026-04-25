@@ -70,3 +70,10 @@ jobs:
       # 9. Test
       - name: Run tests
         run: php artisan test
+        
+      - name: SonarQube Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+            projectBaseDir: .
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
